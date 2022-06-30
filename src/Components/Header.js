@@ -1,20 +1,50 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 import styled from "styled-components";
+import Results from "./Results";
 
 function Header() {
+  const [isSearching, setIsSearching] = useState(false);
+  const [search, setSearch] = useState("");
+  const [searchResultMovies, setSearchResultMovies] = useState([]);
+
+  
+
+
+  useEffect(()=>{
+   const Timer = search&& setTimeout(async ()=>{
+    try{const resp = await fetch(
+        `https://api.themoviedb.org/3/search/movie?api_key=ee52549b20042c4a597febafe87343fe&query=${search}`
+      )
+        const data = await resp.json();
+        setSearchResultMovies(data.results.length>5?data.results.slice(0,5):data.results);
+       
+    
+    }catch(e){
+      console.log(e.message);
+      }
+    }, 10)
+  !search && setSearchResultMovies([])
+    return ()=> clearTimeout(Timer);
+  }, [search])
+
+ 
+  const SearchChangeHandler = (e)=>{
+
+  setSearch(e.target.value);
+
+  }
+
   return (
     <Nav>
-        <Logo src="/images/logo.svg"></Logo>
-      
+      <Logo src="/images/logo.svg"></Logo>
+
       <NavMenu>
-        <a>
+        <NavLink to="/">
           <img src="/images/home-icon.svg" />
           <span>HOME</span>
-        </a>
-        <a>
-          <img src="/images/search-icon.svg" />
-          <span>SEARCH</span>
-        </a>
+        </NavLink>
+
         <a>
           <img src="/images/watchlist-icon.svg" />
           <span>WATCHLIST</span>
@@ -23,15 +53,55 @@ function Header() {
           <img src="/images/movie-icon.svg" />
           <span>MOVIES</span>
         </a>
+        {!isSearching && (
+          <a onClick={setIsSearching.bind("", true)}>
+            <img src="/images/search-icon.svg" />
+            <span>SEARCH</span>
+          </a>
+        )}
+        {isSearching && (
+          <SearchResults>
+            <div>
+              <Input
+                onChange={SearchChangeHandler}
+                style={{ width: "25rem" }}
+              />
+              <Img src="/images/search-icon.svg" />
+            </div>
+            <Results searchResultMovies ={searchResultMovies}/>
+          </SearchResults>
+        )}
       </NavMenu>
-      <Container>
-        <UserImg src="/images/Sample_User_Icon.png" />
-      </Container>
+      <div>
+        <Container>
+          <UserImg src="/images/Sample_User_Icon.png" />
+        </Container>
+      </div>
     </Nav>
   );
 }
 
 export default Header;
+
+const SearchResults= styled.div`
+width = 25rem;
+position:relative;
+`
+
+const Input = styled.input`
+margin-left:1rem;
+background : transparent;
+color:white;
+border: solid 1px rgba(249, 249, 249, 0.2);
+border-radius:2%;
+`
+
+const Img = styled.img`
+      height: 20px;
+      margin-right: 0.2rem;
+      margin-bottom:-0.3rem;
+      cursor:pointer;
+`;
 
 const Nav = styled.div`
   height: 70px;
@@ -48,7 +118,9 @@ const NavMenu = styled.div`
   display: flex;
   flex: 1;
   margin-left: 2rem;
+  
   a {
+    color:#fff;
     display: flex;
     margin-left: 2rem;
     align-items: center;
@@ -90,3 +162,7 @@ const Container = styled.div`
 const UserImg = styled.img`
   width: 40px;
 `;
+
+
+
+/*       */

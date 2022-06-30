@@ -1,19 +1,29 @@
 import styled from "styled-components";
+import LoginModal from "./LoginModal";
+import { useState } from "react";
 
 const Login = (props) => {
+  const [display, setDisplay] = useState(false);
+
+  
+
+const signupHandler = ()=>{
+setDisplay(state=>!state)
+}
   return (
     <Container>
       <Content>
         <CTA>
           <CTALogoOne src="/images/cta-logo-one.svg" alt="" />
-          <SignUp>GET ALL THERE</SignUp>
+          <SignUp onClick={signupHandler}>GET ALL HERE</SignUp>
           <Description>
             Get Premier Access to Raya and the Last Dragon for an additional fee
-            with a Disney+ subscription. As of 03/26/21, the price of Disney+
+            with a Disney+ subscription. As of 06/26/22, the price of Disney+
             and The Disney Bundle will increase by $1.
           </Description>
           <CTALogoTwo src="/images/cta-logo-two.png" alt="" />
         </CTA>
+        {display&&<LoginModal signupHandler={signupHandler}/>}
         <BgImage />
       </Content>
     </Container>
@@ -71,6 +81,7 @@ const CTALogoOne = styled.img`
 `;
 
 const SignUp = styled.a`
+cursor:pointer;
   font-weight: bold;
   color: #f9f9f9;
   background-color: #0063e5;
@@ -101,5 +112,6 @@ const CTALogoTwo = styled.img`
   vertical-align: bottom;
   width: 100%;
 `;
+
 
 export default Login;
