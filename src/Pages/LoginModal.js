@@ -12,7 +12,6 @@ const LoginModal = (props) => {
   const [emailIsValid, setEmailIsValid] = useState(true);
   const dispatch = useDispatch();
   
-  
 
 
 
@@ -49,6 +48,10 @@ const LoginModal = (props) => {
    dispatch(loginRequest(enteredEmail, enteredPassword, userWantsSignin));
 
   };
+
+  const guestLoginHandler = ()=>{
+    dispatch(authActions.setLogin({authKey:"guest"}))
+  }
 
   return (
     <div className={classes.modal}>
@@ -99,6 +102,8 @@ const LoginModal = (props) => {
           </button>
           <br/>
           <br/>
+          <p>Too lazy to login? </p>
+          <button style={{cursor:"pointer"}} onClick={guestLoginHandler}>Enter as Guest</button>
           <Button onClick={props.signupHandler} className="btn">
             X
           </Button>
@@ -119,7 +124,8 @@ overflow:hidden;
 const Button = styled.button`
 border-radius:100%;
 position:absolute;
-bottom:10%;
+bottom:1%;
+left:47%;
 font-size:1rem;
 opacity:0.5;
 cursor:pointer;
