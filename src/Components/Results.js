@@ -1,14 +1,20 @@
+import { useHistory } from "react-router";
 import styled from "styled-components";
 
 
 
 const Results = (props) => {
+  const history = useHistory();
 
-console.log(props.searchResultMovies);
+  const movieClickHandler=(id)=>{
+    history.push("/detail/"+id);
+    props.searchClearer();
+  }
+
 
  const renderedResults = props.searchResultMovies.map((movie) => {
    return (
-     <Container key={movie.id}>
+     <Container key={movie.id} onClick={movieClickHandler.bind("", movie.id)}>
        <div>
          <img src={`https://image.tmdb.org/t/p/w500/${movie.backdrop_path}`} />
        </div>
@@ -43,6 +49,7 @@ const Div = styled.div`
 `;
 
 const Container = styled.div`
+cursor: pointer;
 height:8rem;
 overflow:hidden;
  width:25rem;

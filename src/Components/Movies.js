@@ -1,57 +1,97 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useDispatch } from "react-redux";
-import { detailSliceActions } from "../store/movieDetailSlice";
-import { useHistory } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory, useLocation } from "react-router";
+import { useRef } from "react";
 
 function Movies() {
   const [movieList, setMovieList] = useState([]);
-  const dispatch = useDispatch();
+  const [pageNumber, setPageNumber] = useState(1);
   const history = useHistory();
+  const containerRef = useRef();
+  const location = useLocation().pathname;
+  const movieDetails = useSelector((state) => state.watchlist.movieDetails);
 
-  const moveToPage = ()=>{
-    history.push('/detail');
+  if (location == "/movies") {
+    window.addEventListener("scroll", () => {
+      if (
+        containerRef.current &&
+        window.scrollY > containerRef.current.offsetHeight - 400
+      ) {
+        setPageNumber((state) => state + 1);
+      }
+    });
   }
+
+  const moveToPage = (id) => {
+    history.push("/detail/" + id);
+  };
 
   const fetchMovies = async () => {
     const APIKEY = "ee52549b20042c4a597febafe87343fe";
     const resp = await fetch(`
-https://api.themoviedb.org/3/discover/movie?api_key=${APIKEY}&language=en-US&sort_by=popularity.desc&include_video=false&page=1`);
+https://api.themoviedb.org/3/discover/movie?api_key=${APIKEY}&language=en-US&sort_by=popularity.desc&include_video=false&page=${pageNumber}`);
     const data = await resp.json();
-    setMovieList(data.results);
-    console.log(data.results);
-    dispatch(detailSliceActions.setMovieDetail({movieDetail: data.results[0]}));
+
+    setMovieList((prevState) =>
+      prevState.length > 0 && prevState[0].id === data.results[0].id
+        ? [...prevState]
+        : [...prevState, ...data.results]
+    );
   };
+
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    if (location === "/") {
+      fetchMovies();
+    }
 
-  console.log(movieList);
+    if (location === "/movies") {
+      fetchMovies();
+    }
+  }, [pageNumber]);
 
-  const renderMovies = (first, last) => {
-    return movieList.length >= last
-      ? movieList.slice(first, last).map((movie) => {
-          return (
-            <Wrap key={movie.id} onClick={moveToPage}>
-              <img
-                src={`https://image.tmdb.org/t/p/w500/${movie.backdrop_path}`}
-              />
-              <Name>{movie.title}</Name>
-            </Wrap>
-          );
-        })
-      : "";
+  const renderMovies = (renderList) => {
+    return renderList.map((movie) => {
+      return (
+        <Wrap key={movie.id} onClick={moveToPage.bind("", movie.id)}>
+          <img src={`https://image.tmdb.org/t/p/w500/${movie.backdrop_path}`} />
+          <Name>{movie.title}</Name>
+        </Wrap>
+      );
+    });
   };
 
-  const RecommendedMovies = renderMovies(0, 8);
-  const TrendingMovies = renderMovies(8, 16);
+  const RecommendedMovies = renderMovies(movieList.slice(0, 8));
+  const TrendingMovies = renderMovies(movieList.slice(9, 17));
+  const AllMovies = renderMovies(movieList);
+  const watchlistMovies = renderMovies(movieDetails);
 
-  return (
+  if (location == "/watchlist") {
+    if (movieDetails.length == 0)
+      return (
+        <Container>
+          <h1 style={{ textAlign: "center" }}>Your watchlist is empty!!</h1>
+        </Container>
+      );
+    
+    return (
+      <Container>
+        <h4>Your WatchList</h4>
+        <Content>{watchlistMovies}</Content>
+      </Container>
+    );
+  }
+
+  return location == "/" ? (
     <Container>
       <h4>Recommended for you</h4>
       <Content>{RecommendedMovies}</Content>
       <h4>Trending Movies</h4>
       <Content>{TrendingMovies}</Content>
+    </Container>
+  ) : (
+    <Container ref={containerRef}>
+      <Content>{AllMovies}</Content>
     </Container>
   );
 }

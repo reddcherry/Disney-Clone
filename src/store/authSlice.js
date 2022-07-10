@@ -50,7 +50,7 @@ return async dispatch=>{
    });
    const data = await resp.json();
    if (data.error) throw new Error(data.error.message);
-   console.log(data.idToken);
+  //  console.log(data.idToken);
    dispatch(authActions.setLogin({authKey:data.idToken}));
   } catch(e){
    alert(e.message);

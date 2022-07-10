@@ -13,7 +13,7 @@ function Viewers() {
         <img src="/images/viewers-disney.png" />
         <video
           onMouseEnter={playVideo.bind("", "1")}
-          autoplay
+          autoPlay
           muted
           loop
           id="1"
@@ -34,7 +34,7 @@ function Viewers() {
       <Wrap>
         <img src="/images/viewers-pixar.png" />
         <video
-          autoplay
+          autoPlay
           muted
           loop
           id="2"
@@ -56,7 +56,7 @@ function Viewers() {
       <Wrap>
         <img src="/images/viewers-marvel.png" />
         <video
-          autoplay
+          autoPlay
           muted
           loop
           id="3"
@@ -78,7 +78,7 @@ function Viewers() {
       <Wrap>
         <img src="/images/viewers-national.png" />
         <video
-          autoplay
+          autoPlay
           muted
           loop
           id="4"
@@ -103,7 +103,7 @@ function Viewers() {
       <Wrap>
         <img src="/images/viewers-starwars.png" />
         <video
-          autoplay
+          autoPlay
           muted
           loop
           id="5"

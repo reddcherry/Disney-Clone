@@ -1,39 +1,63 @@
 import React, { useEffect, useState } from "react";
+import { useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import Results from "./Results";
+import { authActions } from "../store/authSlice";
 
 function Header() {
   const [isSearching, setIsSearching] = useState(false);
   const [search, setSearch] = useState("");
   const [searchResultMovies, setSearchResultMovies] = useState([]);
+  const searchInputRef = useRef();
+  const [watchCount, setWatchCount] = useState("");
+  const dispatch = useDispatch();
 
-  
+  const watchlist = useSelector((state) => state.watchlist);
+
+  useEffect(() => {
+    const Timer =
+      search &&
+      setTimeout(async () => {
+        try {
+          const resp = await fetch(
+            `https://api.themoviedb.org/3/search/movie?api_key=ee52549b20042c4a597febafe87343fe&query=${search}`
+          );
+          const data = await resp.json();
+          setSearchResultMovies(
+            data.results.length > 5 ? data.results.slice(0, 5) : data.results
+          );
+        } catch (e) {
+          console.log(e.message);
+        }
+      }, 10);
+    !search && setSearchResultMovies([]);
+    return () => clearTimeout(Timer);
+  }, [search]);
 
 
-  useEffect(()=>{
-   const Timer = search&& setTimeout(async ()=>{
-    try{const resp = await fetch(
-        `https://api.themoviedb.org/3/search/movie?api_key=ee52549b20042c4a597febafe87343fe&query=${search}`
-      )
-        const data = await resp.json();
-        setSearchResultMovies(data.results.length>5?data.results.slice(0,5):data.results);
-       
-    
-    }catch(e){
-      console.log(e.message);
-      }
-    }, 10)
-  !search && setSearchResultMovies([])
-    return ()=> clearTimeout(Timer);
-  }, [search])
+  const SearchChangeHandler = (e) => {
+    setSearch(e.target.value);
+  };
 
- 
-  const SearchChangeHandler = (e)=>{
 
-  setSearch(e.target.value);
+  useEffect(() => {
+    setWatchCount("(" + watchlist.count + ")");
+    setTimeout(() => {
+      setWatchCount("");
+    }, 1000);
+  }, [watchlist.count]);
 
+
+  const logoutHandler =()=>{
+    dispatch(authActions.setLogout());
   }
+
+  const searchClearer = () => {
+    setSearch("");
+    searchInputRef.current.value = "";
+  };
 
   return (
     <Nav>
@@ -45,14 +69,14 @@ function Header() {
           <span>HOME</span>
         </NavLink>
 
-        <a>
+        <NavLink to="/watchlist">
           <img src="/images/watchlist-icon.svg" />
-          <span>WATCHLIST</span>
-        </a>
-        <a>
+          <span>WATCHLIST {watchCount}</span>
+        </NavLink>
+        <NavLink to="/movies">
           <img src="/images/movie-icon.svg" />
           <span>MOVIES</span>
-        </a>
+        </NavLink>
         {!isSearching && (
           <a onClick={setIsSearching.bind("", true)}>
             <img src="/images/search-icon.svg" />
@@ -64,16 +88,20 @@ function Header() {
             <div>
               <Input
                 onChange={SearchChangeHandler}
+                ref={searchInputRef}
                 style={{ width: "25rem" }}
               />
               <Img src="/images/search-icon.svg" />
             </div>
-            <Results searchResultMovies ={searchResultMovies}/>
+            <Results
+              searchResultMovies={searchResultMovies}
+              searchClearer={searchClearer}
+            />
           </SearchResults>
         )}
       </NavMenu>
       <div>
-        <Container>
+        <Container onClick={logoutHandler}>
           <UserImg src="/images/Sample_User_Icon.png" />
         </Container>
       </div>
@@ -83,31 +111,31 @@ function Header() {
 
 export default Header;
 
-const SearchResults= styled.div`
+const SearchResults = styled.div`
 width = 25rem;
 position:relative;
-`
+`;
 
 const Input = styled.input`
-margin-left:1rem;
-background : transparent;
-color:white;
-border: solid 1px rgba(249, 249, 249, 0.2);
-border-radius:2%;
-`
+  margin-left: 1rem;
+  background: transparent;
+  color: white;
+  border: solid 1px rgba(249, 249, 249, 0.2);
+  border-radius: 2%;
+`;
 
 const Img = styled.img`
-      height: 20px;
-      margin-right: 0.2rem;
-      margin-bottom:-0.3rem;
-      cursor:pointer;
+  height: 20px;
+  margin-right: 0.2rem;
+  margin-bottom: -0.3rem;
+  cursor: pointer;
 `;
 
 const Nav = styled.div`
   height: 70px;
   background: black;
   display: flex;
-  
+
   align-items: center;
   padding: 0 36px;
 `;
@@ -118,9 +146,9 @@ const NavMenu = styled.div`
   display: flex;
   flex: 1;
   margin-left: 2rem;
-  
+
   a {
-    color:#fff;
+    color: #fff;
     display: flex;
     margin-left: 2rem;
     align-items: center;
@@ -141,28 +169,26 @@ const NavMenu = styled.div`
         left: 0;
         right: 0;
         opacity: 0;
-        transform:scaleX(0);
+        transform: scaleX(0);
       }
     }
-    &:hover{
-      span:after{
-        transform:scaleX(1);
-        opacity:1;
-        transition:all 0.2s linear;
+    &:hover {
+      span:after {
+        transform: scaleX(1);
+        opacity: 1;
+        transition: all 0.2s linear;
       }
     }
   }
 `;
 const Container = styled.div`
   background: #f0f0f0;
-  align-self:right;
+  align-self: right;
   border-radius: 50%;
-  cursor:pointer;
+  cursor: pointer;
 `;
 const UserImg = styled.img`
   width: 40px;
 `;
-
-
 
 /*       */

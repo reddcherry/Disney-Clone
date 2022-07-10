@@ -10,7 +10,7 @@ function HomeComp() {
     <Container>
      <ImgSlider/>
      <Viewers/>
-     <Movies/>
+     <Movies page="home"/>
     </Container>
   )
 }
@@ -18,7 +18,7 @@ function HomeComp() {
 export default HomeComp
 
 
-const Container = styled.main`
+export const Container = styled.main`
  overflow-x:hidden;
   min-height: calc(100vh - 70px);
   padding: 0 4vw;
