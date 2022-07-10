@@ -14,4 +14,4 @@ The movies page has infinite Scrolling, with the help of scroll Event Listener.
 
 The carousel is made with the help of third party package.
 
-Link to the Demo site https://disney-clone-charan.vercel.app/movies
+Link to the Demo site https://disney-clone-charan.vercel.app
