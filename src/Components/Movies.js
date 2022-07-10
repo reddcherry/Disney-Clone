@@ -14,9 +14,11 @@ function Movies() {
 
   if (location == "/movies") {
     window.addEventListener("scroll", () => {
+      console.log(window.scrollY);
+      console.log(containerRef.current.offsetHeight);
+
       if (
-        containerRef.current &&
-        window.scrollY > containerRef.current.offsetHeight - 400
+        window.scrollY > containerRef.current.offsetHeight - 700
       ) {
         setPageNumber((state) => state + 1);
       }
